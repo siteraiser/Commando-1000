@@ -566,7 +566,7 @@ func toggleXSWD() {
 		for {
 			select {
 			case <-app.OnClose:
-				println("App clsoing and denying")
+				println("App closing and denying")
 				return xswd.Deny
 
 			case line := <-input:
