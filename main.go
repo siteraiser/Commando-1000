@@ -830,7 +830,9 @@ func updateGnomonConnections() {
 
 // Gnomon filters done before startup for now
 func reclassify() {
-	//check if paused / running
+	if gnomon.TargetHeight != 0 {
+		println("Restart wallet and run before starting Gnomon.")
+	}
 	autostart := false
 	res := getText("Start Gnomon after reclassification task has finished? (y/n)")
 	if res == "y" {
