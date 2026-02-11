@@ -520,12 +520,16 @@ func common_processing(wallet *walletapi.Wallet_Disk) {
 
 // XSWD Functions
 func toggleXSWD() {
+	if dero.Wallet == nil {
+		println("Open wallet to create an XSWD connection.")
+		return
+	}
 	if dero.XSWD != nil {
 		dero.XSWD.Stop()
 		dero.XSWD = nil
 		return
 	}
-
+	//dero.XSWD.SetCustomMethod()
 	// NewXSWDServer default behavior is to Ask permission for all requests
 	dero.XSWD = xswd.NewXSWDServer(dero.Wallet, func(app *xswd.ApplicationData) (a bool) {
 		// xswd logger informs if app is requesting permissions upon connection or if app is already connected
