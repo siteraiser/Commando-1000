@@ -364,7 +364,7 @@ Gnomon advanced controls / options
 		setPassHidden()
 	case "3":
 		println("Current Daemon:", dero.DaemonAddr)
-		dero.DaemonAddr = getText("Enter a daemon address or leave blank reset:")
+		dero.DaemonAddr = getText("Enter a daemon address or leave blank to reset:")
 	case "10":
 		updateGnomonFilters()
 	case "11":

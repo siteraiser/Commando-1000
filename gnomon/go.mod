@@ -1,9 +1,9 @@
 module gnomon
 
-go 1.25.3
+go 1.26.0
 
 require (
-	github.com/mattn/go-sqlite3 v1.14.33
+	github.com/mattn/go-sqlite3 v1.14.34
 	github.com/ybbus/jsonrpc/v3 v3.1.7
 )
 

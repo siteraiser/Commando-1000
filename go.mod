@@ -1,6 +1,6 @@
 module commando
 
-go 1.25.3
+go 1.26.0
 
 replace gnomon => ./gnomon
 
@@ -27,7 +27,7 @@ require (
 	github.com/go-logr/zapr v1.3.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
-	github.com/mattn/go-sqlite3 v1.14.33 // indirect
+	github.com/mattn/go-sqlite3 v1.14.34 // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
