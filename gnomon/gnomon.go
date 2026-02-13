@@ -118,20 +118,23 @@ func Start(config Configuration, endpoints []daemon.Connection) {
 	var reclassify = false
 
 	if standalone {
-		//Enter config menu
-		fmt.Println("Configure Gnomon? y or n")
-		_, err = fmt.Scanln(&text)
-		if text == "y" {
-			Config = getConfig(true)
+		if Config.CmdFlags["port"] == "0" {
+			//Enter config menu
+			fmt.Println("Configure Gnomon? y or n")
+			_, err = fmt.Scanln(&text)
+			if text == "y" {
+				Config = getConfig(true)
+			}
+
+			// could be an automated process or in another menu etc..
+			println("Reclassify using a new search filter (in-mem takes a few minutes and opens, processes then saves the entire db)? yes or n")
+			_, err = fmt.Scanln(&text)
+			if text == "yes" {
+				reclassify = true
+			}
+
 		} else {
 			Config = getConfig(false)
-		}
-
-		// could be an automated process or in another menu etc..
-		println("Reclassify using a new search filter (in-mem takes a few minutes and opens, processes then saves the entire db)? yes or n")
-		_, err = fmt.Scanln(&text)
-		if text == "yes" {
-			reclassify = true
 		}
 
 	}
@@ -147,15 +150,18 @@ func Start(config Configuration, endpoints []daemon.Connection) {
 	}
 
 	if !standalone {
-		if Config.CmdFlags["port"] != "0" {
-			go api.Start(Config.CmdFlags["port"].(string), GetDirectory())
-		}
+		//unallowed arg port when using derohe globals... that's ok, we'll just launch it from the options in the wallet/app
+		//	if Config.CmdFlags["port"] != "0" {
+		go api.Start(Config.CmdFlags["port"].(string), GetDirectory())
+		//	}
 	} else {
-		println("Start Gnomon indexer? y or n")
-		_, err = fmt.Scanln(&text)
-		if text == "n" {
-			panic("Exited")
-		}
+		if Config.CmdFlags["port"] == "0" {
+			println("Start Gnomon indexer? y or n")
+			_, err = fmt.Scanln(&text)
+			if text == "n" {
+				panic("Exited")
+			}
+		} // else it has already started in admin
 	}
 	//Add custom actions for scids
 	//CustomActions[Hardcoded_SCIDS[0]] = action{Type: "SC", Act: "discard-before", Block: 161296} //saveasinteraction

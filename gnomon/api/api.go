@@ -8,13 +8,19 @@ import (
 	"net/url"
 	"path/filepath"
 	"strconv"
+	"time"
 
+	"gnomon/daemon"
 	sql "gnomon/db"
+	"gnomon/show"
 )
 
 var sqlite = &sql.SqlStore{}
+var GnomonStarted = false
+var Port = "0"
 
 func Start(port string, db_dir string) {
+	Port = port
 	go func() {
 		log.Println("Server listening on port " + port)
 	}()
@@ -23,6 +29,10 @@ func Start(port string, db_dir string) {
 	db_path := filepath.Join(wd, "gnomondb")
 	sqlite, _ = sql.NewDiskDB(db_path, db_name)
 
+	http.HandleFunc("/Info", Info)
+	http.HandleFunc("/Start", Launch)
+	http.HandleFunc("/Pause", Pause)
+	http.HandleFunc("/Resume", Resume)
 	http.HandleFunc("/GetLastIndexHeight", GetLastIndexHeight)
 	http.HandleFunc("/GetAllOwnersAndSCIDs", GetAllOwnersAndSCIDs)
 	http.HandleFunc("/GetAllSCIDVariableDetails", GetAllSCIDVariableDetails)
@@ -33,6 +43,8 @@ func Start(port string, db_dir string) {
 	http.HandleFunc("/GetSCIDsByClass", GetSCIDsByClass)
 	http.HandleFunc("/GetSCIDsByTags", GetSCIDsByTags)
 	http.HandleFunc("/GetSCsByTags", GetSCsByTags)
+
+	//http.HandleFunc("/info", GetSCsByTags)
 	http.ListenAndServe("localhost:"+port, nil)
 }
 func head(w http.ResponseWriter) {
@@ -49,6 +61,82 @@ func QueryParam(i string, query string) string {
 	}
 	queryParams := parsedURL.Query()
 	return queryParams.Get(i)
+}
+
+func Info(w http.ResponseWriter, r *http.Request) {
+	head(w)
+	started := false
+	if daemon.PreferredRequests != 0 {
+		started = true
+	}
+	paused := false
+	if daemon.Status.Paused {
+		paused = true
+	}
+	li := int64(0)
+	if sqlite != nil && sqlite.DB != nil {
+		li, _ = sqlite.GetLastIndexHeight()
+	}
+
+	jsonData, _ := json.Marshal(
+		map[string]any{
+			"started":    started,
+			"paused":     paused,
+			"last_index": li,
+		})
+	fmt.Fprint(w, string(jsonData))
+}
+
+func WaitForStart() {
+	fmt.Println("Waiting for web api input")
+	for {
+		w, _ := time.ParseDuration("100ms")
+		time.Sleep(w)
+		if GnomonStarted {
+			break
+		}
+	}
+}
+func Launch(w http.ResponseWriter, r *http.Request) {
+	head(w)
+	show.NewMessage(show.Message{Text: "Starting Gnomon."})
+	GnomonStarted = true
+	for {
+		w, _ := time.ParseDuration("100ms")
+		time.Sleep(w)
+		if daemon.PreferredRequests != 0 {
+			daemon.UnPause()
+			break
+		}
+	}
+	jsonData, _ := json.Marshal(map[string]any{"status": true})
+	fmt.Fprint(w, string(jsonData))
+}
+
+// Pause
+func Pause(w http.ResponseWriter, r *http.Request) {
+	head(w)
+	show.NewMessage(show.Message{Text: "Api pause request received, pausing..."})
+	jsonData := []byte{}
+	if daemon.PreferredRequests != 0 {
+
+		daemon.Pause()
+		w, _ := time.ParseDuration("1s")
+		time.Sleep(w)
+		if daemon.Paused() {
+			jsonData, _ = json.Marshal(map[string]any{"status": true})
+		} else {
+			jsonData, _ = json.Marshal(map[string]any{"status": false, "error_msg": "Gnomon is still starting up or not running"})
+		}
+
+	}
+	fmt.Fprint(w, string(jsonData))
+}
+func Resume(w http.ResponseWriter, r *http.Request) {
+	head(w)
+	daemon.UnPause()
+	jsonData, _ := json.Marshal(map[string]bool{"status": true})
+	fmt.Fprint(w, string(jsonData))
 }
 
 // Check Gnomon indexed height

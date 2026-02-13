@@ -208,7 +208,7 @@ func getConfig(update bool) Configuration {
 	// Filters
 
 	val, err = sql.LoadSetting(Sqlite.DB, "Filters")
-	if val == "" || update {
+	if (val == "" || update) && Config.CmdFlags["port"] == "0" {
 		println("Edit filters? y or n")
 		_, err = fmt.Scanln(&text)
 		if text == "n" {
@@ -247,6 +247,7 @@ func getConfig(update bool) Configuration {
 
 	if Config.CmdFlags["port"] != "0" {
 		go api.Start(Config.CmdFlags["port"].(string), GetDirectory())
+		api.WaitForStart() // Only wait when port is supplied with args
 	} else {
 		//ask
 		fmt.Println("Enter a port number for the api or n to skip:")
@@ -257,9 +258,12 @@ func getConfig(update bool) Configuration {
 		}
 	}
 
-	fmt.Println("Choose display mode, 0, 1 or 2:")
-	_, err = fmt.Scanln(&text)
-	show.DisplayMode, _ = strconv.Atoi(text)
+	show.DisplayMode = 1
+	if api.Port == "0" && Config.CmdFlags["port"] == "0" {
+		fmt.Println("Choose display mode, 0, 1 or 2:")
+		_, err = fmt.Scanln(&text)
+		show.DisplayMode, _ = strconv.Atoi(text)
+	}
 
 	return config
 }

@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"gnomon"
+	"gnomon/api"
 	"gnomon/daemon"
 	sql "gnomon/db"
 	"gnomon/show"
@@ -318,8 +319,8 @@ pause
 resume
 mute - Don't receive any Gnomon updates
 unmute
-indexes - Shows Tela indexes
 search - Search filtered classes and tags
+indexes - Shows Tela indexes
 
 -XSWD-
 xswd - Start / stop toggle for XSWD server
@@ -347,6 +348,8 @@ Gnomon advanced controls / options
 [12] Edit Gnomon http connections
 [13] Max ram usage
 [14] Show Gnomon status
+[15] Launch webapi
+
 [0]  Return
 
 `)
@@ -375,6 +378,8 @@ Gnomon advanced controls / options
 		updateGnomonMem()
 	case "14":
 		showGnomonStatus()
+	case "15":
+		startGnomonWebAPI()
 	}
 	options()
 }
@@ -833,9 +838,18 @@ func updateGnomonConnections() {
 	}
 }
 
+var GnomonAPIPort = "0"
+
+func startGnomonWebAPI() {
+	db_name := fmt.Sprintf("sql%s.db", "GNOMON")
+	db_path := filepath.Join(GConfig.CmdFlags["mode"].(string), "gnomondb")
+	GnomonAPIPort = getText(`Enter a port for Gnomon API:`)
+	go api.Start(GnomonAPIPort, filepath.Join(db_path, db_name))
+}
+
 // Gnomon filters done before startup for now
 func reclassify() {
-	if gnomon.TargetHeight != 0 {
+	if gnomon.TargetHeight != 0 { //works until fast typers start typing fast lols...
 		println("Restart wallet and run before starting Gnomon.")
 		return
 	}
