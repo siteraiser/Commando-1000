@@ -28,6 +28,27 @@ Configuration Options: <br>
 
 Gnomon Api Method Examples:
 
+**Info** Show Gnomon Info<br>
+```bash
+curl -X GET "http://localhost:8080/Info" \
+```
+
+**Start** Start Gnomon<br>
+```bash
+curl -X GET "http://localhost:8080/Start" \
+```
+
+
+**Start** Pause Gnomon<br>
+```bash
+curl -X GET "http://localhost:8080/Pause" \
+```
+
+**Start** Un-Pause (resume) Gnomon<br>
+```bash
+curl -X GET "http://localhost:8080/Resume" \
+```
+
 **GetLastIndexHeight** Returns the last stored index height<br>
 Request:
 ```bash

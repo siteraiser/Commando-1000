@@ -63,6 +63,8 @@ func QueryParam(i string, query string) string {
 	return queryParams.Get(i)
 }
 
+// Info about Gnomon
+// http://localhost:8080/Info
 func Info(w http.ResponseWriter, r *http.Request) {
 	head(w)
 	started := false
@@ -87,6 +89,8 @@ func Info(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(jsonData))
 }
 
+// Start
+// http://localhost:8080/Start
 func WaitForStart() {
 	fmt.Println("Waiting for web api input")
 	for {
@@ -114,6 +118,7 @@ func Launch(w http.ResponseWriter, r *http.Request) {
 }
 
 // Pause
+// http://localhost:8080/Pause
 func Pause(w http.ResponseWriter, r *http.Request) {
 	head(w)
 	show.NewMessage(show.Message{Text: "Api pause request received, pausing..."})
@@ -132,6 +137,9 @@ func Pause(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprint(w, string(jsonData))
 }
+
+// Resume
+// http://localhost:8080/Resume
 func Resume(w http.ResponseWriter, r *http.Request) {
 	head(w)
 	daemon.UnPause()
