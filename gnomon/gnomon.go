@@ -16,7 +16,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gnomon/api"
 	"gnomon/daemon"
 
 	"github.com/deroproject/derohe/cryptography/crypto"
@@ -149,12 +148,7 @@ func Start(config Configuration, endpoints []daemon.Connection) {
 		panic("Error getting height ...." + strconv.Itoa(int(LatestTopoHeight)))
 	}
 
-	if !standalone {
-		//unallowed arg port when using derohe globals... that's ok, we'll just launch it from the options in the wallet/app
-		//	if Config.CmdFlags["port"] != "0" {
-		go api.Start(Config.CmdFlags["port"].(string), GetDirectory())
-		//	}
-	} else {
+	if standalone {
 		if Config.CmdFlags["port"] == "0" {
 			println("Start Gnomon indexer? y or n")
 			_, err = fmt.Scanln(&text)
