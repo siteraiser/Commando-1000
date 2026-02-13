@@ -1027,33 +1027,37 @@ func searchFiltered() {
 			var hVars []*structs.SCIDVariable
 			hVars = gnomon.Sqlite.GetSCIDVariableDetailsAtTopoheight(scid, height)
 			for i, variable := range hVars {
-				isstr := false
-				switch variable.Value.(type) {
-				case string:
-					isstr = true
-				}
-
-				if isstr && strings.Contains(variable.Key.(string), "name") {
-					fmt.Println(variable.Key, ":", variable.Value)
-				} else {
-					if isstr {
+				kis := isAStr(variable.Key)
+				vis := isAStr(variable.Value)
+				if kis && vis {
+					if strings.Contains(variable.Key.(string), "name") {
+						fmt.Println(variable.Key, ":", variable.Value)
+					} else {
 						if len(variable.Value.(string)) > 100 {
 							fmt.Println(variable.Key, ":", strings.TrimSpace(variable.Value.(string)[:100]), "...")
 						} else {
 							fmt.Println(variable.Key, ":", strings.TrimSpace(variable.Value.(string)))
 						}
-					} else {
-						fmt.Println(variable.Key, ":", variable.Value)
 					}
+				} else {
+					fmt.Println(variable.Key, ":", variable.Value)
 				}
 				if i > 3 {
 					break
 				}
 			}
 		}
+
 		fmt.Println("------------------------------------------------------------------------------------------")
 	}
 	getText(`Press enter to continue.`)
+}
+func isAStr(value any) bool {
+	switch value.(type) {
+	case string:
+		return true
+	}
+	return false
 }
 
 /*
