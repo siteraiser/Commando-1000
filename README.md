@@ -1,2 +1,2 @@
 # Commando-1000
-Command-line crypto currency wallet for Dero
+Command-line cryptocurrency wallet for Dero
