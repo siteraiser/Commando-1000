@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"path/filepath"
@@ -22,12 +21,19 @@ var Port = "0"
 func Start(port string, db_dir string) {
 	Port = port
 	go func() {
-		log.Println("Server listening on port " + port)
+		fmt.Println("Server listening on port " + port)
 	}()
 	db_name := fmt.Sprintf("sql%s.db", "GNOMON")
 	wd := db_dir
 	db_path := filepath.Join(wd, "gnomondb")
 	sqlite, _ = sql.NewDiskDB(db_path, db_name)
+
+	height, err := sqlite.GetLastIndexHeight()
+	if err != nil {
+		fmt.Println("Error:", db_path, err)
+	} else {
+		fmt.Println("Last Index", height)
+	}
 
 	http.HandleFunc("/Info", Info)
 	http.HandleFunc("/Start", Launch)
@@ -45,7 +51,6 @@ func Start(port string, db_dir string) {
 	http.HandleFunc("/GetSCIDsByTags", GetSCIDsByTags)
 	http.HandleFunc("/GetSCsByTags", GetSCsByTags)
 
-	//http.HandleFunc("/info", GetSCsByTags)
 	http.ListenAndServe("localhost:"+port, nil)
 }
 func head(w http.ResponseWriter) {
@@ -98,6 +103,18 @@ func WaitForStart() {
 		w, _ := time.ParseDuration("100ms")
 		time.Sleep(w)
 		if GnomonStarted {
+			break
+		}
+	}
+}
+func WaitAndStart(start func()) {
+
+	fmt.Println("Waiting for web api input")
+	for {
+		w, _ := time.ParseDuration("100ms")
+		time.Sleep(w)
+		if GnomonStarted {
+			start()
 			break
 		}
 	}

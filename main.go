@@ -695,6 +695,8 @@ func showGnomonStatus() {
 			fmt.Println("Gnomon running.")
 		}
 	}
+
+	fmt.Println("Gnomon API port:", api.Port)
 	fmt.Println("Using memory (gnomon):", gnomon.UseMem)
 	fmt.Println("Max memory usage (gnomon):", gnomon.RamSizeMB, "MB")
 	fmt.Println("Max memory usage (saved):", getGnomonMaxMem(), "MB")
@@ -841,10 +843,9 @@ func updateGnomonConnections() {
 var GnomonAPIPort = "0"
 
 func startGnomonWebAPI() {
-	db_name := fmt.Sprintf("sql%s.db", "GNOMON")
-	db_path := filepath.Join(GConfig.CmdFlags["mode"].(string), "gnomondb")
 	GnomonAPIPort = getText(`Enter a port for Gnomon API:`)
-	go api.Start(GnomonAPIPort, filepath.Join(db_path, db_name))
+	go api.Start(GnomonAPIPort, GConfig.CmdFlags["mode"].(string))
+	go api.WaitAndStart(startGnomon)
 }
 
 // Gnomon filters done before startup for now
