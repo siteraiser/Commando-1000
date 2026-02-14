@@ -39,12 +39,12 @@ curl -X GET "http://localhost:8080/Start" \
 ```
 
 
-**Start** Pause Gnomon<br>
+**Pause** Pause Gnomon<br>
 ```bash
 curl -X GET "http://localhost:8080/Pause" \
 ```
 
-**Start** Un-Pause (resume) Gnomon<br>
+**Resume** Un-Pause (Pause) Gnomon<br>
 ```bash
 curl -X GET "http://localhost:8080/Resume" \
 ```
