@@ -848,7 +848,9 @@ func startGnomonWebAPI() {
 	}
 	GnomonAPIPort = getText(`Enter a port for Gnomon API:`)
 	go api.Start(GnomonAPIPort, GConfig.CmdFlags["mode"].(string))
-	go api.WaitAndStart(startGnomon)
+	if !gnomon.Started {
+		go api.WaitAndStart(startGnomon)
+	}
 }
 
 // Gnomon filters done before startup for now

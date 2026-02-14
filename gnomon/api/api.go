@@ -15,7 +15,7 @@ import (
 )
 
 var sqlite = &sql.SqlStore{}
-var GnomonStarted = false
+var StartGnomon = false
 var Port = "0"
 
 func Start(port string, db_dir string) {
@@ -102,7 +102,7 @@ func WaitForStart() {
 	for {
 		w, _ := time.ParseDuration("100ms")
 		time.Sleep(w)
-		if GnomonStarted {
+		if StartGnomon {
 			break
 		}
 	}
@@ -113,7 +113,7 @@ func WaitAndStart(start func()) {
 	for {
 		w, _ := time.ParseDuration("100ms")
 		time.Sleep(w)
-		if GnomonStarted {
+		if StartGnomon {
 			start()
 			break
 		}
@@ -122,7 +122,7 @@ func WaitAndStart(start func()) {
 func Launch(w http.ResponseWriter, r *http.Request) {
 	head(w)
 	show.NewMessage(show.Message{Text: "Starting Gnomon."})
-	GnomonStarted = true
+	StartGnomon = true
 	for {
 		w, _ := time.ParseDuration("100ms")
 		time.Sleep(w)
