@@ -126,7 +126,7 @@ func Launch(w http.ResponseWriter, r *http.Request) {
 	for {
 		w, _ := time.ParseDuration("100ms")
 		time.Sleep(w)
-		if daemon.PreferredRequests != 0 {
+		if daemon.PreferredRequests != 0 || daemon.Paused() {
 			daemon.UnPause()
 			break
 		}

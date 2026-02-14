@@ -568,7 +568,7 @@ func makeIntegratedAddress() (address *rpc.Address) {
 }
 
 func tokens() {
-	if gnomon.TargetHeight == 0 {
+	if !gnomon.Started {
 		println("Gnomon not running.") // maybe offer scids from the gnomon SC on-chain
 		return
 	}

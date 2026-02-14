@@ -253,11 +253,13 @@ func Start(config Configuration, endpoints []daemon.Connection) {
 	}
 	// Tells the indexer when the current
 	EndingHeight = ending_height
+	Started = true
 	start_gnomon_indexer()
 }
 
 var EndingHeight = int64(-1)
 var FinishHeight int64
+var Started = false
 
 func start_gnomon_indexer() {
 	var starting_height int64

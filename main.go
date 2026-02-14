@@ -464,7 +464,7 @@ func close() {
 		if dero.XSWD != nil {
 			toggleXSWD()
 		}
-		if gnomon.TargetHeight != 0 && !daemon.Paused() && !gnomon_updates_muted {
+		if gnomon.Started && !daemon.Paused() && !gnomon_updates_muted {
 			fmt.Println("Resuming Gnomon status updates.")
 		}
 		gnomon_updates_enabled = true
@@ -686,7 +686,7 @@ func startGnomon() {
 }
 
 func showGnomonStatus() {
-	if gnomon.TargetHeight == 0 {
+	if !gnomon.Started {
 		fmt.Println("Gnomon not started.")
 	} else {
 		if daemon.Paused() {
@@ -712,7 +712,7 @@ func showGnomonStatus() {
 	} else {
 		fmt.Println("Highest indexed block:", highest_indexed)
 	}
-	if gnomon.TargetHeight != 0 {
+	if gnomon.Started {
 		fmt.Println("Filters applied:", len(gnomon.Filters))
 	} else {
 		val, _ := Sqlite.LoadSetting("Filters")
@@ -788,7 +788,7 @@ func updateGnomonMem() {
 	fmt.Println("Saving value in Mb:", meminmb)
 	Sqlite.SaveSetting("RamSizeMB", meminmb)
 	//Should switch to disk mode if set under the file size on the next batch finish
-	if gnomon.TargetHeight != 0 {
+	if gnomon.Started {
 		fmt.Println("Updating live settings (max ram Mb). This doesn't free up ram immediately and requires a restart to enable in-memory tables.", meminmb)
 		gnomon.RamSizeMB, _ = strconv.Atoi(meminmb)
 	}
@@ -843,6 +843,9 @@ func updateGnomonConnections() {
 var GnomonAPIPort = "0"
 
 func startGnomonWebAPI() {
+	if api.Port != "0" {
+		println("Api already started on port:", api.Port)
+	}
 	GnomonAPIPort = getText(`Enter a port for Gnomon API:`)
 	go api.Start(GnomonAPIPort, GConfig.CmdFlags["mode"].(string))
 	go api.WaitAndStart(startGnomon)
@@ -850,7 +853,7 @@ func startGnomonWebAPI() {
 
 // Gnomon filters done before startup for now
 func reclassify() {
-	if gnomon.TargetHeight != 0 { //works until fast typers start typing fast lols...
+	if gnomon.Started {
 		println("Restart wallet and run before starting Gnomon.")
 		return
 	}
@@ -879,7 +882,7 @@ func reclassify() {
 	gnomon.Filters = getGnomonFilters(GConfig.Filters)
 	gnomon.InitializeFilters()
 	gnomon.ReClassify()
-	if autostart && gnomon.TargetHeight == 0 {
+	if autostart && !gnomon.Started {
 		startGnomon()
 	}
 }
@@ -925,7 +928,7 @@ func getGnomonFilters(Filters map[string]map[string][]string) map[string]map[str
 
 // Runs after startup
 func getTelaIndexes() {
-	if gnomon.TargetHeight == 0 {
+	if !gnomon.Started {
 		println("Gnomon not started")
 		return
 	}
@@ -975,7 +978,7 @@ func getDistinctFromCSV(q string, v any) (results []string) {
 
 // Search for scs by class or tag
 func searchFiltered() {
-	if gnomon.TargetHeight == 0 {
+	if !gnomon.Started {
 		println("Gnomon not started")
 		return
 	}
