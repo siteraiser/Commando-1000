@@ -1041,26 +1041,33 @@ func searchFiltered() {
 		if show_details {
 			var hVars []*structs.SCIDVariable
 			hVars = gnomon.Sqlite.GetSCIDVariableDetailsAtTopoheight(scid, height)
+			name := ""
+			data := ""
 			for i, variable := range hVars {
+
 				kis := isAStr(variable.Key)
 				vis := isAStr(variable.Value)
 				if kis && vis {
 					if strings.Contains(variable.Key.(string), "name") {
-						fmt.Println(variable.Key, ":", variable.Value)
+						name = variable.Key.(string) + ":" + variable.Value.(string) + "\n"
 					} else {
 						if len(variable.Value.(string)) > 100 {
-							fmt.Println(variable.Key, ":", strings.TrimSpace(variable.Value.(string)[:100]), "...")
+							data += variable.Key.(string) + ":" + strings.TrimSpace(variable.Value.(string)[:100]) + "...\n"
 						} else {
-							fmt.Println(variable.Key, ":", strings.TrimSpace(variable.Value.(string)))
+							data += variable.Key.(string) + ":" + strings.TrimSpace(variable.Value.(string)) + "\n"
 						}
 					}
-				} else {
-					fmt.Println(variable.Key, ":", variable.Value)
+				} else if !kis && !vis {
+					nk := strconv.Itoa(variable.Key.(int))
+					nv := strconv.Itoa(variable.Value.(int))
+					data += nk + ":" + nv + "\n"
 				}
+
 				if i > 3 {
 					break
 				}
 			}
+			println(name + data)
 		}
 
 		fmt.Println("------------------------------------------------------------------------------------------")
