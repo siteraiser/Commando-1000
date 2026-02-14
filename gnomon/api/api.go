@@ -35,6 +35,7 @@ func Start(port string, db_dir string) {
 	http.HandleFunc("/Resume", Resume)
 	http.HandleFunc("/GetLastIndexHeight", GetLastIndexHeight)
 	http.HandleFunc("/GetAllOwnersAndSCIDs", GetAllOwnersAndSCIDs)
+	http.HandleFunc("/GetInitialSCIDCode", GetInitialSCIDCode)
 	http.HandleFunc("/GetAllSCIDVariableDetails", GetAllSCIDVariableDetails)
 	http.HandleFunc("/GetSCIDVariableDetailsAtTopoheight", GetSCIDVariableDetailsAtTopoheight)
 	http.HandleFunc("/GetSCIDInteractionHeight", GetSCIDInteractionHeight)

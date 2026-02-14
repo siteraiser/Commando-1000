@@ -28,23 +28,23 @@ Configuration Options: <br>
 
 Gnomon Api Method Examples:
 
-**Info** Show Gnomon Info<br>
+**Info** Show Gnomon Info - Misc. info including "started" status, "paused" state and "last_index".<br>
 ```bash
 curl -X GET "http://localhost:8080/Info" \
 ```
 
-**Start** Start Gnomon<br>
+**Start** Start Gnomon - Returns field "status" true if successful.<br>
 ```bash
 curl -X GET "http://localhost:8080/Start" \
 ```
 
 
-**Pause** Pause Gnomon<br>
+**Pause** Pause Gnomon - Returns field "status" true if successful and false if failed.<br>
 ```bash
 curl -X GET "http://localhost:8080/Pause" \
 ```
 
-**Resume** Un-Pause (Pause) Gnomon<br>
+**Resume** Un-Pause Gnomon - Returns field "status" true if successful.<br>
 ```bash
 curl -X GET "http://localhost:8080/Resume" \
 ```
