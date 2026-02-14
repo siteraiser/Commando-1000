@@ -72,7 +72,7 @@ func checkWallet() {
 				} else {
 					time.Sleep(20 * time.Second)
 					if !dero.Wallet.IsRegistered() {
-						fmt.Println(`Wait for wallet height to appear, try to register again after a few minutes if it remains at 0`)
+						fmt.Println(`Wait for wallet height to appear, try to check/register again after a few minutes if it remains at 0`)
 					}
 				}
 			}
