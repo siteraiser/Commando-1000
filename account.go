@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"syscall"
 	"time"
+	"unicode/utf8"
 
 	"github.com/deroproject/derohe/cryptography/crypto"
 	"github.com/deroproject/derohe/globals"
@@ -143,8 +144,13 @@ func register() {
 	}
 }
 
+var utf8_err_msg = "Only UTF8 text is currently supported."
+
 // Creates a new wallet with supplied password, asks for wallet name then saves and closes it
 func createWallet(password string) (address, seed string, ok bool) {
+	if !utf8.ValidString(password) {
+		println(utf8_err_msg)
+	}
 	dero.Path = getBasePath()
 	dero.WalletName = getText(`Enter DB Name for New Account (eg. wallet.db):`)
 	if fileExists(filepath.Join(dero.Path, dero.WalletName)) {
@@ -181,7 +187,10 @@ func recoverFromSeed() (ok bool) {
 		println("Error: File already exists.")
 		return
 	}
-	password := getPassword(`Enter Password:`)
+	password := getPassword(`Enter Password (utf8):`)
+	if !utf8.ValidString(password) {
+		println(utf8_err_msg)
+	}
 	electrum_words := getText(`Enter 25 word seed phrase:`)
 	temp, err := walletapi.Create_Encrypted_Wallet_From_Recovery_Words(filepath.Join(dero.Path, dero.WalletName), password, electrum_words)
 	if err != nil {
@@ -215,6 +224,9 @@ func recoverFromHex() (ok bool) {
 		return
 	}
 	password := getPassword(`Enter Password:`)
+	if !utf8.ValidString(password) {
+		println(utf8_err_msg)
+	}
 	seed_key_string := getText(`Enter your seed (hex 64 chars):`)
 
 	seed_raw, err := hex.DecodeString(seed_key_string)
@@ -263,6 +275,9 @@ func changePassword() {
 		fmt.Println("Incorrect password, not updated")
 	}
 	new_password := getText("Enter new password:")
+	if !utf8.ValidString(new_password) {
+		println(utf8_err_msg)
+	}
 	if new_password == "" {
 		fmt.Println("Password not updated")
 	}
