@@ -315,11 +315,12 @@ func start_gnomon_indexer() {
 				w, _ := time.ParseDuration("1s")
 				time.Sleep(w)
 				if !daemon.Paused() {
+					daemon.Status.Mutex.Unlock()
 					break
 				}
 			}
-			daemon.Status.Mutex.Unlock()
 		}
+		daemon.Status.Mutex.Unlock()
 		//---- MAIN PRINTOUT
 		showBlockStatus(bheight)
 		daemon.Ask("height")
