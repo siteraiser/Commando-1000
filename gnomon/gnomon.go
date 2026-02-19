@@ -309,18 +309,8 @@ func start_gnomon_indexer() {
 		if !daemon.OK() {
 			break
 		}
-		daemon.Status.Mutex.Lock()
-		if daemon.Paused() {
-			for {
-				w, _ := time.ParseDuration("1s")
-				time.Sleep(w)
-				if !daemon.Paused() {
-					daemon.Status.Mutex.Unlock()
-					break
-				}
-			}
-		}
-		daemon.Status.Mutex.Unlock()
+		daemon.PauseCheck()
+
 		//---- MAIN PRINTOUT
 		showBlockStatus(bheight)
 		daemon.Ask("height")
@@ -430,7 +420,8 @@ func start_gnomon_indexer() {
 	}
 	show.NewMessage(show.Message{Text: "Saving phase over......"})
 	Sqlite.ViewTables()
-
+	//Check again if paused
+	daemon.PauseCheck()
 	start_gnomon_indexer()
 
 }

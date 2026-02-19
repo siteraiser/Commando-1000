@@ -85,7 +85,21 @@ func UnPause() {
 	Status.Mutex.Unlock()
 }
 func Paused() bool {
+	Status.Mutex.Lock()
+	defer Status.Mutex.Unlock()
 	return Status.Paused
+}
+func PauseCheck() {
+	if Paused() {
+		for {
+			w, _ := time.ParseDuration("1s")
+			time.Sleep(w)
+			if !Paused() {
+				return
+			}
+		}
+	}
+	return
 }
 
 var Status = &structs.State{
