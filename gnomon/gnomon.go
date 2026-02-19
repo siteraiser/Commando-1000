@@ -309,6 +309,7 @@ func start_gnomon_indexer() {
 		if !daemon.OK() {
 			break
 		}
+		daemon.Status.Mutex.Lock()
 		if daemon.Paused() {
 			for {
 				w, _ := time.ParseDuration("1s")
@@ -317,6 +318,7 @@ func start_gnomon_indexer() {
 					break
 				}
 			}
+			daemon.Status.Mutex.Unlock()
 		}
 		//---- MAIN PRINTOUT
 		showBlockStatus(bheight)
