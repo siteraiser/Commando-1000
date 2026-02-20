@@ -809,6 +809,55 @@ func (ss *SqlStore) GetInitialSCIDCode(scid string) (sc_code string, err error) 
 	return
 }
 
+// Get sc code and variables from latest record
+func (ss *SqlStore) GetSC(scid string) (sc_code string, hVars []*structs.SCIDVariable) {
+
+	results := make(map[int64][]*structs.SCIDVariable)
+	var heights []int64
+
+	ready(false)
+
+	rows, _ := ss.DB.Query(
+		`SELECT height, vars
+			FROM variables
+			WHERE txid IN (
+				SELECT txid
+				FROM invokes
+				WHERE scid = ?
+			) OR txid IN (
+				SELECT scid
+				FROM scs
+				WHERE scid = ?
+			)  ORDER BY height DESC LIMIT 1;`,
+		scid,
+		scid,
+	)
+	ready(true)
+	var (
+		vars   string
+		height int
+	)
+
+	for rows.Next() {
+		rows.Scan(&height, &vars)
+		topoheight, _ := strconv.ParseInt(string(height), 10, 64)
+		heights = append(heights, topoheight)
+		var variables []*structs.SCIDVariable
+		_ = json.Unmarshal([]byte(vars), &variables)
+		results[topoheight] = variables
+	}
+
+	if results != nil {
+		hVars = getTypedVariables(heights, results)
+	}
+	for _, v := range hVars {
+		if v.Key == "C" {
+			sc_code = v.Value.(string)
+		}
+	}
+	return
+}
+
 // -----------------
 // -----------------
 // -----------------

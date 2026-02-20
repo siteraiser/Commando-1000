@@ -12,6 +12,7 @@ import (
 	"gnomon/daemon"
 	sql "gnomon/db"
 	"gnomon/show"
+	"gnomon/structs"
 )
 
 var sqlite = &sql.SqlStore{}
@@ -41,6 +42,7 @@ func Start(port string, db_dir string) {
 	http.HandleFunc("/Resume", Resume)
 	http.HandleFunc("/GetLastIndexHeight", GetLastIndexHeight)
 	http.HandleFunc("/GetAllOwnersAndSCIDs", GetAllOwnersAndSCIDs)
+	http.HandleFunc("/GetSC", GetSC)
 	http.HandleFunc("/GetInitialSCIDCode", GetInitialSCIDCode)
 	http.HandleFunc("/GetAllSCIDVariableDetails", GetAllSCIDVariableDetails)
 	http.HandleFunc("/GetSCIDVariableDetailsAtTopoheight", GetSCIDVariableDetailsAtTopoheight)
@@ -59,14 +61,14 @@ func head(w http.ResponseWriter) {
 }
 
 // Returns a query parameter value by key
-func QueryParam(i string, query string) string {
+func QueryParam(key string, query string) string {
 	parsedURL, err := url.Parse("?" + query)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return ""
 	}
 	queryParams := parsedURL.Query()
-	return queryParams.Get(i)
+	return queryParams.Get(key)
 }
 
 // Info about Gnomon
@@ -179,6 +181,22 @@ func GetLastIndexHeight(w http.ResponseWriter, r *http.Request) {
 func GetAllOwnersAndSCIDs(w http.ResponseWriter, r *http.Request) {
 	head(w)
 	jsonData, _ := json.Marshal(sqlite.GetAllOwnersAndSCIDs())
+	fmt.Fprint(w, string(jsonData))
+}
+
+// Get the SC and variables
+// http://localhost:8080/GetSC?scid=b77b1f5eeff6ed39c8b979c2aeb1c800081fc2ae8f570ad254bedf47bfa977f0
+func GetSC(w http.ResponseWriter, r *http.Request) {
+	head(w)
+	sc_code, vars := sqlite.GetSC(QueryParam("scid", r.URL.RawQuery))
+
+	jsonData, _ := json.Marshal(struct {
+		Sccode string                  `json:"sc_code"`
+		Vars   []*structs.SCIDVariable `json:"variables"`
+	}{
+		Sccode: sc_code,
+		Vars:   vars,
+	})
 	fmt.Fprint(w, string(jsonData))
 }
 

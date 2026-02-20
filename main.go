@@ -348,7 +348,7 @@ Gnomon advanced controls / options
 [12] Edit Gnomon http connections
 [13] Max ram usage
 [14] Show Gnomon status
-[15] Launch webapi
+[15] Launch web api
 
 [0]  Return
 
@@ -686,6 +686,14 @@ func startGnomon() {
 }
 
 func showGnomonStatus() {
+	/* useful debug info
+	fmt.Println("gnomon.TargetHeight:", gnomon.TargetHeight)
+	fmt.Println("gnomon.LatestTopoHeight:", gnomon.LatestTopoHeight)
+	fmt.Println("gnomon.EndingHeight:", gnomon.EndingHeight)
+	fmt.Println("gnomon.FinishHeight:", gnomon.FinishHeight)
+	fmt.Println("daemon.Endpoints:", daemon.Endpoints)
+	fmt.Println("daemon.Status:", daemon.Status)
+	*/
 	if !gnomon.Started {
 		fmt.Println("Gnomon not started.")
 	} else {

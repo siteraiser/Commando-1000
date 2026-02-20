@@ -61,6 +61,16 @@ Request:
 curl -X GET "http://localhost:8080/GetAllOwnersAndSCIDs" \
 ```
 
+**GetSC** Gets latest contract code and variables<br>
+Request:
+```bash
+curl -X GET "http://localhost:8080/GetSC?scid=b77b1f5eeff6ed39c8b979c2aeb1c800081fc2ae8f570ad254bedf47bfa977f0" \
+```
+Response:
+```json
+"string..."
+```
+
 **GetInitialSCIDCode** Returns the originally installed contract code <br>
 Request:
 ```bash
@@ -68,8 +78,9 @@ curl -X GET "http://localhost:8080/GetInitialSCIDCode?scid=b77b1f5eeff6ed39c8b97
 ```
 Response:
 ```json
-"string..."
+{"sc_code":"","variables":[{"Key":"C","Value":""},{"Key":"owner","Value":"..."}]}
 ```
+
 **GetAllSCIDVariableDetails**  Returns a list of all variable details by scid <br>
 Request:
 ```bash
