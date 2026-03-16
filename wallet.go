@@ -96,7 +96,7 @@ func listComments(in, out bool) {
 	println("Syncing...")
 	dero.Wallet.Sync_Wallet_Memory_With_Daemon()
 	time.Sleep(time.Second)
-
+	time.Sleep(time.Second) //Make it 2...
 	// Check receiver
 	entries := dero.Wallet.Show_Transfers(crypto.ZEROHASH, coinbase, in, out, uint64(0), uint64(0), "", "", 0, 0)
 
