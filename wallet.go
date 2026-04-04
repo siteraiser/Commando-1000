@@ -96,7 +96,7 @@ func listComments(in, out bool) {
 	println("Syncing...")
 	dero.Wallet.Sync_Wallet_Memory_With_Daemon()
 	time.Sleep(time.Second)
-	time.Sleep(time.Second) //Make it 2...
+
 	// Check receiver
 	entries := dero.Wallet.Show_Transfers(crypto.ZEROHASH, coinbase, in, out, uint64(0), uint64(0), "", "", 0, 0)
 
@@ -142,23 +142,23 @@ func processPayload(e *rpc.Entry) (args rpc.Arguments) {
 
 	args = rpc.Arguments{
 		rpc.Argument{
-			Name: "RPC_DESTINATION_PORT", DataType: "U", Value: dest_port,
+			Name: "D", DataType: "U", Value: dest_port,
 		},
 		rpc.Argument{
-			Name: "RPC_VALUE_TRANSFER", DataType: "U", Value: value,
+			Name: "V", DataType: "U", Value: value,
 		},
 		rpc.Argument{
-			Name: "RPC_COMMENT", DataType: "S", Value: comment,
+			Name: "C", DataType: "S", Value: comment,
 		},
 		rpc.Argument{
-			Name: "RPC_REPLYBACK_ADDRESS", DataType: "S", Value: reply_address,
+			Name: "R", DataType: "S", Value: reply_address,
 		},
 
 		rpc.Argument{
-			Name: "RPC_NEEDS_REPLYBACK_ADDRESS", DataType: "U", Value: needs_reply_address,
+			Name: "N", DataType: "U", Value: needs_reply_address,
 		},
 	}
-	return
+	return args
 }
 func showPayload(entry *rpc.Entry) {
 	var args rpc.Arguments

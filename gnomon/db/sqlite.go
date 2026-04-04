@@ -102,7 +102,7 @@ func (ss *SqlStore) WriteToDisk(end int64) error {
 		query += "UPDATE diskdb.state SET value = (SELECT value FROM main.state WHERE name = 'sessionstart') WHERE name = 'sessionstart';"
 	}
 
-	//see if the competed record exists yet
+	//see if the completed record exists yet
 	var checkcompleted string
 	newerr := dest.QueryRow("SELECT value FROM settings WHERE name = 'completed' ").Scan(&checkcompleted)
 
