@@ -174,9 +174,10 @@ func showPayload(entry *rpc.Entry) {
 	}
 	if entry.PayloadType == 1 && entry.PayloadError != "" { //&& t.Status == 1
 		args = processPayload(entry)
+	} else {
+		args = entry.Payload_RPC
 	}
 	if entry.Incoming {
-		args = entry.Payload_RPC
 		// Should check for spoofing here...
 		if entry.Payload_RPC.Has(rpc.RPC_REPLYBACK_ADDRESS, rpc.DataString) {
 			reply_address, _ = globals.ParseValidateAddress(entry.Payload_RPC.Value(rpc.RPC_REPLYBACK_ADDRESS, rpc.DataString).(string))
