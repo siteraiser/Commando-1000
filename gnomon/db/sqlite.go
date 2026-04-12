@@ -634,7 +634,7 @@ func (ss *SqlStore) ViewTables() {
 }
 
 func (ss *SqlStore) GetSCIDsByClass(class_list []string) (results []string) {
-
+	// This can be sured up by checking the list of classes or parameterizing the query (somehow lol).
 	qinsert := ""
 	for _, class := range class_list {
 		qinsert += "OR (class = '" + class + "') OR ('" + class + "' LIKE (class || ',%')) OR ('" + class + "' LIKE ('%,' || class || ',%')) OR ('" + class + "' LIKE ('%,' || class)) "
