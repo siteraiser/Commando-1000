@@ -811,7 +811,7 @@ func getGnomonConnections() (endpoints []daemon.Connection) {
 		endpoints = []daemon.Connection{}
 		addrs := strings.Split(val, ",")
 		for _, add := range addrs {
-			endpoints = append(daemon.Endpoints, daemon.Connection{Address: strings.TrimSpace(add)})
+			endpoints = append(endpoints, daemon.Connection{Address: strings.TrimSpace(add)})
 		}
 	}
 	return
