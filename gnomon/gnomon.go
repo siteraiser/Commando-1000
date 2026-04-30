@@ -145,7 +145,10 @@ func Start(config Configuration, endpoints []daemon.Connection) {
 	daemon.InitEndpoint() //set default endpoint[0]
 	LatestTopoHeight = daemon.GetTopoHeight()
 	if LatestTopoHeight < 1 {
-		panic("Error getting height ...." + strconv.Itoa(int(LatestTopoHeight)))
+		fmt.Println("Error getting height " + strconv.Itoa(int(LatestTopoHeight)) + " Exiting in 10 seconds.")
+		s, _ := time.ParseDuration("10s")
+		time.Sleep(s)
+		panic("")
 	}
 
 	if standalone {
