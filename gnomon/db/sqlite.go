@@ -638,7 +638,7 @@ func (ss *SqlStore) GetSCIDsByClass(class_list []string) (results []string) {
 	qinsert := ""
 	var qvars = []any{}
 	for _, class := range class_list {
-		qinsert += "OR (class = ?) OR (? LIKE (class || ',%')) OR (? LIKE ('%,' || class || ',%')) OR (? LIKE ('%,' || class)) "
+		qinsert += "OR (class = ?) OR (class LIKE (? || ',%')) OR (class LIKE ('%,' || ? || ',%')) OR (class LIKE ('%,' || ?)) "
 		qvars = append(
 			qvars,
 			class,
@@ -646,7 +646,6 @@ func (ss *SqlStore) GetSCIDsByClass(class_list []string) (results []string) {
 			class,
 			class,
 		)
-
 	}
 	qinsert = strings.TrimPrefix(qinsert, "OR ")
 	ready(false)
@@ -667,7 +666,7 @@ func (ss *SqlStore) GetSCIDsByTags(tags_list []string) (results []string) {
 	qinsert := ""
 	var qvars = []any{}
 	for _, tag := range tags_list {
-		qinsert += "OR (tags = ?) OR (? LIKE (tags || ',%')) OR (? LIKE ('%,' || tags || ',%')) OR (? LIKE ('%,' || tags)) "
+		qinsert += "OR (tags = ?) OR (tags LIKE (? || ',%')) OR (tags LIKE ('%,' || ? || ',%')) OR (tags LIKE ('%,' || ?)) "
 		qvars = append(
 			qvars,
 			tag,
@@ -698,7 +697,7 @@ func (ss *SqlStore) GetSCsByTags(tags_list []string) (results []map[string]any) 
 	qinsert := ""
 	var qvars = []any{}
 	for _, tag := range tags_list {
-		qinsert += "OR (tags = ?) OR (? LIKE (tags || ',%')) OR (? LIKE ('%,' || tags || ',%')) OR (? LIKE ('%,' || tags)) "
+		qinsert += "OR (tags = ?) OR (tags LIKE (? || ',%')) OR (tags LIKE ('%,' || ? || ',%')) OR (tags LIKE ('%,' || ?)) "
 		qvars = append(
 			qvars,
 			tag,
