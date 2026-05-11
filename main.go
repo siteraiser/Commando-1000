@@ -527,6 +527,7 @@ func common_processing(wallet *walletapi.Wallet_Disk) {
 
 // XSWD Gnomon custom functions (applied after NewXSWDServer)
 type GetAllOwnersAndSCIDs_Result struct {
+	// Struct jacked directly from Engram wallet :D
 	AllOwners map[string]string `json:"allOwners"`
 }
 
@@ -535,11 +536,9 @@ func GetAllOwnersAndSCIDs(ctx context.Context) (result GetAllOwnersAndSCIDs_Resu
 		err = fmt.Errorf("gnomon is not active")
 		return
 	}
-	owners := make(map[string]string)
-	Sqlite := getGnomonDiskDB()
+	Sqlite := getGnomonDiskDB() // fast enough
 	defer Sqlite.DB.Close()
-	owners = Sqlite.GetAllOwnersAndSCIDs()
-	result.AllOwners = owners
+	result.AllOwners = Sqlite.GetAllOwnersAndSCIDs()
 	return
 }
 
