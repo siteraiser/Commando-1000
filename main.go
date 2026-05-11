@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -21,6 +22,7 @@ import (
 	"time"
 
 	"github.com/creachadair/jrpc2"
+	"github.com/creachadair/jrpc2/handler"
 	"github.com/deroproject/derohe/config"
 	"github.com/deroproject/derohe/globals"
 	"github.com/deroproject/derohe/walletapi"
@@ -523,6 +525,24 @@ func common_processing(wallet *walletapi.Wallet_Disk) {
 // Endpoint
 // curl -X POST "http://127.0.0.1:10103/json_rpc" -H "Content-Type: application/json" -u "derouser:password" -d "{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"GetAddress\"}"
 
+// XSWD Gnomon custom functions (applied after NewXSWDServer)
+type GetAllOwnersAndSCIDs_Result struct {
+	AllOwners map[string]string `json:"allOwners"`
+}
+
+func GetAllOwnersAndSCIDs(ctx context.Context) (result GetAllOwnersAndSCIDs_Result, err error) {
+	if !gnomon.Started {
+		err = fmt.Errorf("gnomon is not active")
+		return
+	}
+	owners := make(map[string]string)
+	Sqlite := getGnomonDiskDB()
+	defer Sqlite.DB.Close()
+	owners = Sqlite.GetAllOwnersAndSCIDs()
+	result.AllOwners = owners
+	return
+}
+
 // XSWD Functions
 func toggleXSWD() {
 
@@ -535,7 +555,7 @@ func toggleXSWD() {
 		println("Open wallet to create an XSWD connection.")
 		return
 	}
-	//dero.XSWD.SetCustomMethod("scvarsbyheight", scvarsbyheight())
+
 	// NewXSWDServer default behavior is to Ask permission for all requests
 	dero.XSWD = xswd.NewXSWDServer(dero.Wallet, func(app *xswd.ApplicationData) (a bool) {
 		// xswd logger informs if app is requesting permissions upon connection or if app is already connected
@@ -596,6 +616,10 @@ func toggleXSWD() {
 			}
 		}
 	})
+	// Set custom methods
+	if gnomon.Started {
+		dero.XSWD.SetCustomMethod("Gnomon.GetAllOwnersAndSCIDs", handler.New(GetAllOwnersAndSCIDs))
+	}
 
 	// check if start was successful
 	time.Sleep(time.Second)
