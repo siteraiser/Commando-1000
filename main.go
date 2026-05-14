@@ -526,16 +526,25 @@ func common_processing(wallet *walletapi.Wallet_Disk) {
 // curl -X POST "http://127.0.0.1:10103/json_rpc" -H "Content-Type: application/json" -u "derouser:password" -d "{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"GetAddress\"}"
 
 // XSWD Gnomon custom functions (applied after NewXSWDServer)
+// GetLastIndexHeight
+type GetLastIndexHeight_Result struct {
+	LastIndexHeight int64 `json:"lastIndexHeight"`
+}
+
+func GetLastIndexHeight(ctx context.Context) (result GetLastIndexHeight_Result, err error) {
+	Sqlite := getGnomonDiskDB() // fast enough
+	defer Sqlite.DB.Close()
+	result.LastIndexHeight, err = Sqlite.GetLastIndexHeight()
+	return
+}
+
 type GetAllOwnersAndSCIDs_Result struct {
 	// Struct jacked directly from Engram wallet :D
 	AllOwners map[string]string `json:"allOwners"`
 }
 
 func GetAllOwnersAndSCIDs(ctx context.Context) (result GetAllOwnersAndSCIDs_Result, err error) {
-	if !gnomon.Started {
-		err = fmt.Errorf("gnomon is not active")
-		return
-	}
+	err = nil
 	Sqlite := getGnomonDiskDB() // fast enough
 	defer Sqlite.DB.Close()
 	result.AllOwners = Sqlite.GetAllOwnersAndSCIDs()
@@ -616,9 +625,8 @@ func toggleXSWD() {
 		}
 	})
 	// Set custom methods
-	if gnomon.Started {
-		dero.XSWD.SetCustomMethod("Gnomon.GetAllOwnersAndSCIDs", handler.New(GetAllOwnersAndSCIDs))
-	}
+	dero.XSWD.SetCustomMethod("Gnomon.GetLastIndexHeight", handler.New(GetLastIndexHeight))
+	dero.XSWD.SetCustomMethod("Gnomon.GetAllOwnersAndSCIDs", handler.New(GetAllOwnersAndSCIDs))
 
 	// check if start was successful
 	time.Sleep(time.Second)
