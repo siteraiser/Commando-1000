@@ -13,6 +13,8 @@ import (
 	"gnomon/show"
 	"gnomon/structs"
 	"math"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"slices"
@@ -525,6 +527,46 @@ func common_processing(wallet *walletapi.Wallet_Disk) {
 // Endpoint
 // curl -X POST "http://127.0.0.1:10103/json_rpc" -H "Content-Type: application/json" -u "derouser:password" -d "{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"GetAddress\"}"
 
+// Example tela link "tela://open/eb209a53d52fc695733810313f70a385a7c1b1736753bafd8c0eed5b4c0aa3a9"
+type (
+	TelaLoader_Params struct {
+		TelaLink string `json:"telaLink"` // format is target://<arg>/<arg>/...
+	}
+
+	TelaLoader_Result struct {
+		TelaLinkResult string `json:"telaLinkResult"`
+	}
+)
+
+// Uses registered port and auth token from Gnomon api (maybe move to another place)
+func HandleTELALinks(ctx context.Context, p TelaLoader_Params) (result TelaLoader_Result, err error) {
+	parsedURL, err := url.Parse(p.TelaLink)
+	if err != nil {
+		err = fmt.Errorf("Invalid Tela link: %s", err)
+		return
+	}
+	if parsedURL.Scheme == "tela" {
+		parts := strings.Split(strings.Trim(parsedURL.Path, "/"), "/")
+		result.TelaLinkResult = p.TelaLink
+
+		client := &http.Client{
+			Timeout: 10 * time.Second,
+		}
+		// Create a PUT request with no body (nil)
+		req, _ := http.NewRequest(http.MethodPut, "http://localhost:8081/tela/open/"+parts[0], nil)
+
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-Launcher-Token", api.AppToken)
+
+		// Send the request
+		resp, _ := client.Do(req)
+		resp.Body.Close()
+	} else {
+		err = fmt.Errorf("Couldn't load link: %s", err)
+	}
+	return
+}
+
 // XSWD Gnomon custom functions (applied after NewXSWDServer)
 // GetLastIndexHeight
 type GetLastIndexHeight_Result struct {
@@ -625,6 +667,7 @@ func toggleXSWD() {
 		}
 	})
 	// Set custom methods
+	dero.XSWD.SetCustomMethod("HandleTELALinks", handler.New(HandleTELALinks))
 	dero.XSWD.SetCustomMethod("Gnomon.GetLastIndexHeight", handler.New(GetLastIndexHeight))
 	dero.XSWD.SetCustomMethod("Gnomon.GetAllOwnersAndSCIDs", handler.New(GetAllOwnersAndSCIDs))
 

@@ -53,8 +53,40 @@ func Start(port string, db_dir string) {
 	http.HandleFunc("/GetSCIDsByTags", GetSCIDsByTags)
 	http.HandleFunc("/GetSCsByTags", GetSCsByTags)
 
+	http.HandleFunc("/Register", Register) // register tela launcher port and auth token (used in main.go xswd/tela)
+
 	http.ListenAndServe("localhost:"+port, nil)
 }
+
+// Tela Launcher Link Passthrough
+var appPort = ""
+var AppToken = ""
+
+type launcherTokenResponse struct {
+	Token string `json:"token"`
+}
+
+func Register(w http.ResponseWriter, r *http.Request) {
+	head(w)
+	port := r.URL.Query().Get("port")
+	jsonData, _ := json.Marshal(map[string]any{"status": true})
+	fmt.Fprint(w, string(jsonData))
+
+	url := fmt.Sprintf("http://localhost:%s%s", port, "/VerifyLauncher")
+	resp, err := http.Get(url)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	var lt launcherTokenResponse
+	if err := json.NewDecoder(resp.Body).Decode(&lt); err != nil {
+		return
+	}
+	appPort = port
+	AppToken = lt.Token
+}
+
+// Header helper
 func head(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Accept", "application/x-www-form-urlencoded; charset=utf-8")
