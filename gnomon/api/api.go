@@ -69,10 +69,11 @@ type launcherTokenResponse struct {
 func Register(w http.ResponseWriter, r *http.Request) {
 	head(w)
 	port := r.URL.Query().Get("port")
+	challenge := r.URL.Query().Get("challenge")
 	jsonData, _ := json.Marshal(map[string]any{"status": true})
 	fmt.Fprint(w, string(jsonData))
 
-	url := fmt.Sprintf("http://localhost:%s%s", port, "/VerifyLauncher")
+	url := fmt.Sprintf("http://localhost:%s%s?challenge=%s", port, "/VerifyLauncher", challenge)
 	resp, err := http.Get(url)
 	if err != nil {
 		return
